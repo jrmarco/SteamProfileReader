@@ -24,7 +24,7 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
 
  When using the live fetch, the tool read the Steam page profile based on the SteamID provided into the constructor, and retrive the content from the page. Using different methods it's possible to obtain specific part of the user profile :
 
-    1. $steamProfileReader->getFavGame() : retrive an object that containts the favorite game selected displayed on the user profile
+ 1. $steamProfileReader->getFavGame() - retrive an object that containts the favorite game selected displayed on the user profile
     	Structure of the FavGame object :
 ```
             $game->img  	   : Favourite game image url to Steam page
@@ -33,7 +33,7 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
             $game->time 	   : Favourite hours played
             $game->achivNumber : Favourite number of achievements
 ```
-    2. $steamProfileReader->getLastPlayed() : retrive an array of objects containing the last games played displayed on the user profile
+ 2. $steamProfileReader->getLastPlayed() - retrive an array of objects containing the last games played displayed on the user profile
     	Structure of the LastPlayed object :
 ```
             $game->image      : Game image url
@@ -42,14 +42,14 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
             $game->name       : Game name
             $game->page       : Game url to Steam page
 ```
-    3. $steamProfileReader->getMedals() : retrive an array of objects containing the displayed medals on the user profile
+ 3. $steamProfileReader->getMedals() - retrive an array of objects containing the displayed medals on the user profile
     	Structure of the Medal object :
 ```
             $medal->name  : Medal name 
             $medal->link  : Medal url to Steam page
             $medal->img   : Medal image url to Steam page
 ```
-    4. $steamProfileReader->getAchivements() : retrive an array of objects containing the displayed achievements on the user profile
+ 4. $steamProfileReader->getAchivements() - retrive an array of objects containing the displayed achievements on the user profile
     	Structure of the Achievement object :
 ```
             $achievement->game        : Game name
@@ -58,7 +58,8 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
             $achievement->page        : Achievement url to Steam page
             $achievement->img         : Achievement image url to Steam page
 ```
-    5. $steamProfileReader->getUserDetails() : retrive an objects containing the user profile details
+ 5. $steamProfileReader->getUserDetails() - retrive an objects containing the user profile details
+ 		Structure of the User object :
 ```
             $user->nickname  : User steam nickname
             $user->imgFull   : User image url to Steam page ( large format )
@@ -73,17 +74,18 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
 #### Persistence on DB
 
  Is it possible to directly store all the previous information ( array and object ) into a predefined set of tables. To realize it :
- ```
- 	$steamProfileReader = new SteamProfileReader('<steamID>');
-    $steamProfileReader->saveOnDb();
- ```
+```
+$steamProfileReader = new SteamProfileReader('<steamID>');
+$steamProfileReader->saveOnDb();
+```
+ 
  The function takes care of all the necessary steps to be able to store all the structure and the related information. Prior this, you have to define your system setting to be able to communicate with the database inside the config.php file : 
- 	1. Choose your prefix name for the tables : define('TABLEPREFIX',"<prefix_name");
- 	2. Six tables are created using the prefix name string : PREFIX_achievements, PREFIX_conf, PREFIX_favgames, PREFIX_medals, PREFIX_playedGames, PREFIX_users
- 	3. Running the function will fetch the data from the Steam profile page and store it in the related table
+ 1. Choose your prefix name for the tables : define(TABLEPREFIX,<prefix_name>)
+ 2. Six tables are created using the prefix name string : PREFIX_achievements, PREFIX_conf, PREFIX_favgames, PREFIX_medals, PREFIX_playedGames, PREFIX_users
+ 3. Running the function will fetch the data from the Steam profile page and store it in the related table
  	   Each element of the table it's stored using as ID an MD5 values of the full set of information to avoid storing the same type of object more than once. 
 
- 	 Table follows this structure :
+ 	 Tables follows this structure :
 
 ```
 		//Conf table

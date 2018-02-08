@@ -20,7 +20,7 @@ The Steam Custom ID differs from the SteamID . The Steam Custom ID refers to the
 ```http://steamcommunity.com/id/<steamCustomId>```
 This ID could be totally different from the Steam ID and it's choosen by the user itself from the profile editor page
 
-![Profile Editor](http://bigm.it/assets/media/steameditor.png)
+![Profile Editor](https://bigm.it/assets/media/steameditor.png)
 
 ## Run the tool
 

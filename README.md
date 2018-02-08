@@ -1,6 +1,6 @@
 # SteamProfileReader
 
-This PHP class provides a tool to fetch static data from the Steam User profile page based on a provided SteamID
+This PHP class provides a tool to fetch static data from the Steam User profile page based on a provided Steam Custom ID
 
 ## Requirements
 
@@ -14,15 +14,23 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
  3. Include the SteamProfileReader.php inside a dedicated page or in any place of your code
  4. Change the setting into the config.php to match your installation
 
+## Steam Custom ID 
+
+The Steam Custom ID differs from the SteamID . The Steam Custom ID refers to the ID used by Steam to identify an user profile page :
+```http://steamcommunity.com/id/<steamCustomId>```
+This ID could be totally different from the Steam ID and it's choosen by the user itself from the profile editor page
+
+![Profile Editor](http://bigm.it/assets/media/steameditor.png)
+
 ## Run the tool
 
  1. Create a new instance of the SteamProfileReader : 
- ```$spr = new SteamProfileReader('<steam_id>');```
+ ```$spr = new SteamProfileReader('<Steam Custom ID>');```
  2. Fetch content live or save it into your database
 
-### Live fetching
+## Live fetching
 
- When using the live fetch, the tool read the Steam page profile based on the SteamID provided into the constructor, and retrive the content from the page. Using different methods it's possible to obtain specific part of the user profile :
+ When using the live fetch, the tool read the Steam page profile based on the Steam Custom ID provided into the constructor, and retrive the content from the page. Using different methods it's possible to obtain specific part of the user profile :
 
  1. $steamProfileReader->getFavGame() - retrive an object that containts the favorite game selected displayed on the user profile
     	Structure of the FavGame object :
@@ -71,19 +79,18 @@ This PHP class provides a tool to fetch static data from the Steam User profile 
             $user->badgeImg  : Badge profile image url to Steam page
 ```
 
-#### Persistence on DB
+## Persistence on DB
 
  Is it possible to directly store all the previous information ( array and object ) into a predefined set of tables. To realize it :
 ```
-$steamProfileReader = new SteamProfileReader('<steamID>');
+$steamProfileReader = new SteamProfileReader('<Steam Custom ID>');
 $steamProfileReader->saveOnDb();
 ```
  
  The function takes care of all the necessary steps to be able to store all the structure and the related information. Prior this, you have to define your system setting to be able to communicate with the database inside the config.php file : 
  1. Choose your prefix name for the tables : define(TABLEPREFIX,<prefix_name>)
  2. Six tables are created using the prefix name string : PREFIX_achievements, PREFIX_conf, PREFIX_favgames, PREFIX_medals, PREFIX_playedGames, PREFIX_users
- 3. Running the function will fetch the data from the Steam profile page and store it in the related table
- 	   Each element of the table it's stored using as ID an MD5 values of the full set of information to avoid storing the same type of object more than once. 
+ 3. Running the function will fetch the data from the Steam profile page and store it in the related table. Each element of the table it's stored using as ID an MD5 values of the full set of information to avoid storing the same type of object more than once. 
 
  	 Tables follows this structure :
 
@@ -145,7 +152,10 @@ $steamProfileReader->saveOnDb();
 		`img` varchar(255) CHARACTER SET utf8 NOT NULL,                            
 		PRIMARY KEY UNIQUE (id)              
 ```
+## Check User status
+```   SteamProfileReader::checkUserStatus(<Steam Custom ID>); ```
+ It is possible to receive the online status for a user, using the Steam Custom ID, calling the static method checkUserStatus. This will return his online status (Currently Online/Currently Offline) always based on the information provided by the Steam user page
 
-##### DISCLAIMER
+# DISCLAIMER
 
  All contents fetched,loaded,read from Steam are protected by copyright and trademarks by Steam, the software owner and/or third party license . Please check [Legal](http://store.steampowered.com/legal/), [Privacy Policy](http://store.steampowered.com/privacy_agreement/), [User Agreement](http://store.steampowered.com/subscriber_agreement/) for further information

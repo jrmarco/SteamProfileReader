@@ -1,6 +1,10 @@
 <?php
 /**
- * SteamProfileReader v1.0
+ * SteamProfileReader v1.1
+ * Minor fixes : Steam has update html elements naming for Achivements and Medals
+ *     - 'showcase_achievement'         -> 'showcase_achievement '
+ *     - 'showcase_slot showcase_badge' -> 'showcase_slot showcase_badge '
+ *     - 'data-community-tooltip="'     -> 'data-tooltip-html="'
  */
 require 'PersistenceDB.php';
 
@@ -133,13 +137,14 @@ class SteamProfileReader
     private function fetchAchievements()
     {
         foreach ($this->pageElement as $key => $string) {
-            if (preg_match("/showcase_achievement/", $string)) {
+            if (preg_match("/showcase_achievement /", $string)) {
                 $achievement = new stdClass();
 
-                $game = explode('data-community-tooltip="', $this->pageElement[$key].$this->pageElement[$key+1]);
+                $game = explode('data-tooltip-html="', $this->pageElement[$key].$this->pageElement[$key+1]);
                 if (!isset($game[1])) {
                     continue;
                 }
+
                 $game = explode('<br>', $game[1]);
                 $achievement->game = trim($game[0]);
                 $achievement->name = trim($game[1]);
@@ -178,7 +183,7 @@ class SteamProfileReader
     private function fetchMedals()
     {
         foreach ($this->pageElement as $key => $string) {
-            if (preg_match("/showcase_slot showcase_badge/", $string)) {
+            if (preg_match("/showcase_slot showcase_badge /", $string)) {
                 $medal = new stdClass();
 
                 $medal->name = preg_replace("/[^A-Za-z0-9 ]/",'',$this->pageElement[$key + 1]);

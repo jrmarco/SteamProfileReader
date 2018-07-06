@@ -44,9 +44,11 @@ class PersistenceDB{
         $singleSet = ["_users"=>$arrDataset['_users'],"_favgames"=>$arrDataset['_favgames']];
         $this->saveUserRelated($singleSet);
 
-        $arrSet = ["_playedGames"=>$arrDataset['_playedGames'],
-                   "_achievements"=>$arrDataset['_achievements'],
-                   "_medals"=>$arrDataset['_medals']];
+        $arrSet = [
+                    //"_playedGames"=>$arrDataset['_playedGames'],
+                    "_achievements"=>$arrDataset['_achievements'],
+                    "_medals"=>$arrDataset['_medals']
+        ];
 
         foreach ($arrSet as $table => $dataset ) {
             $this->saveArrObject($table,$dataset);
@@ -181,17 +183,18 @@ class PersistenceDB{
         $sql .= 'ALTER TABLE `'.TABLEPREFIX.'_favgames` ADD UNIQUE (`id`);';
 
         // LastPlayed table
-        $sql .= 'CREATE TABLE `'.TABLEPREFIX.'_playedGames` (
-              `id` varchar(255) NOT NULL,
-              `steamID` varchar(255) CHARACTER SET utf8 NOT NULL,
-              `image` varchar(255) CHARACTER SET utf8 NOT NULL,
-              `totTime`     varchar(255) CHARACTER SET utf8 NOT NULL,
-              `lastPlayed` varchar(255) CHARACTER SET utf8 NULL,
-              `name` varchar(255) CHARACTER SET utf8 NULL,
-              `page` varchar(255) CHARACTER SET utf8 NULL,                                
-              PRIMARY KEY (id)              
-            );';
-        $sql .= 'ALTER TABLE `'.TABLEPREFIX.'_playedGames` ADD UNIQUE (`id`);';
+        // Update : Steam has removed last played game view in non-logged mode. Feature has been deactivated
+//        $sql .= 'CREATE TABLE `'.TABLEPREFIX.'_playedGames` (
+//              `id` varchar(255) NOT NULL,
+//              `steamID` varchar(255) CHARACTER SET utf8 NOT NULL,
+//              `image` varchar(255) CHARACTER SET utf8 NOT NULL,
+//              `totTime`     varchar(255) CHARACTER SET utf8 NOT NULL,
+//              `lastPlayed` varchar(255) CHARACTER SET utf8 NULL,
+//              `name` varchar(255) CHARACTER SET utf8 NULL,
+//              `page` varchar(255) CHARACTER SET utf8 NULL,
+//              PRIMARY KEY (id)
+//            );';
+//        $sql .= 'ALTER TABLE `'.TABLEPREFIX.'_playedGames` ADD UNIQUE (`id`);';
 
         // Achievement table
         $sql .= 'CREATE TABLE `'.TABLEPREFIX.'_achievements` (

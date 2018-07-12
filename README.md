@@ -28,6 +28,15 @@ This ID could be totally different from the Steam ID and it's choosen by the use
  ```$spr = new SteamProfileReader('<Steam Custom ID>');```
  2. Fetch content live or save it into your database
 
+## Data and information
+
+All data coming from this class it is publicly accessible. We do not :
+- use any illegal action to fetch them
+- interfere with service or security service of the website
+- steal this data from any protected section of the website
+
+Any type of abuse it's reasonable on a wrong usage of the component or modification by the original code and purpose  
+
 ## Live fetching
 
  When using the live fetch, the tool read the Steam page profile based on the Steam Custom ID provided into the constructor, and retrive the content from the page. Using different methods it's possible to obtain specific part of the user profile :
@@ -159,3 +168,5 @@ $steamProfileReader->saveOnDb();
 # DISCLAIMER
 
  All contents fetched,loaded,read from Steam are protected by copyright and trademarks by Steam, the software owner and/or third party license . Please check [Legal](http://store.steampowered.com/legal/), [Privacy Policy](http://store.steampowered.com/privacy_agreement/), [User Agreement](http://store.steampowered.com/subscriber_agreement/) for further information
+ 
+ I'm not responsible for any issue nor any kind of legal affair that this component could or would cause at your person/business.

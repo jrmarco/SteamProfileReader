@@ -1,6 +1,18 @@
 <?php
 /**
- * SteamProfileReader v1.0
+ * SteamProfileReader v1.3
+ * 1.3 -> Changes :
+ *  Totally removed reference for last played games.
+ *  Added featured games fetch
+ *  New styling on the user page required a new indexing of elements to compose the user dataset
+ *
+ * 1.2 -> Changes :
+ *  Removed last played functionality
+ *
+ * 1.1 -> Minor fixes : Steam has update html elements naming for Achievements and Medals
+ *  'showcase_achievement'         -> 'showcase_achievement '
+ *  'showcase_slot showcase_badge' -> 'showcase_slot showcase_badge '
+ *  'data-community-tooltip="'     -> 'data-tooltip-html="'
  */
 require 'PersistenceDB.php';
 
@@ -11,7 +23,7 @@ class SteamProfileReader
 
     private $pageElement;
 
-//    private $lastPlayed;
+    private $featuredGames;
     private $achievements;
     private $medals;
     private $favGame;
@@ -56,7 +68,6 @@ class SteamProfileReader
      */
     public function reload($blnCleanStored = false) {
         if($blnCleanStored==true) {
-//            $this->lastPlayed   = null;
             $this->achievements = null;
             $this->medals       = null;
             $this->favGame      = null;
@@ -77,7 +88,7 @@ class SteamProfileReader
         $fileName = $protocol.'://steamcommunity.com/id/' . $this->steamID . '?l=' . $this->strLang;
         $this->pageElement = file($fileName);
         $this->fetchUserData();
-//        $this->fetchPlayedGames();
+        $this->featuredGames();
         $this->fetchAchievements();
         $this->fetchMedals();
         $this->fetchFavouriteGame();
@@ -95,17 +106,17 @@ class SteamProfileReader
             if (preg_match("/profile_header_content/", $string)) {
                 $user->nickname = trim(strip_tags($this->pageElement[$key + 4]));
 
-                $img = explode('<img src="',$this->pageElement[$key + 26]);
+                $img = explode('<img src="',$this->pageElement[$key + 29]);
                 $user->imgFull = trim(str_replace($this->closingTags,'',$img[1]));
                 $user->imgMid  = str_replace('_full','_medium',$user->imgFull);
                 $user->imgSmall= str_replace('_medium','',$user->imgMid);
 
                 $user->level = trim(strip_tags($this->pageElement[$key + 31]));
-                $user->badgeName = trim(str_replace($this->closingTags,'',$this->pageElement[$key + 36]));
+                $user->badgeName = trim(str_replace($this->closingTags,'',$this->pageElement[$key + 39]));
 
-                $link = explode('href="',$this->pageElement[$key + 37]);
+                $link = explode('href="',$this->pageElement[$key + 40]);
                 $user->badgePage = trim(str_replace($this->closingTags,'',$link[1]));
-                $img = explode('src="',$this->pageElement[$key + 38]);
+                $img = explode('src="',$this->pageElement[$key + 41]);
                 $user->badgeImg  = trim(str_replace(array_merge($this->closingTags,array('" class="badge_icon small')),'',$img[1]));
             }
         }
@@ -113,35 +124,37 @@ class SteamProfileReader
         $this->userData = $user;
     }
 
-    /**
-     * Fetch played games from the Steam user page
-     * Update : Steam has removed last played game view in non-logged mode. Feature has been deactivated
-     * @return void
-     */
-//    private function fetchPlayedGames()
-//    {
-//        foreach ($this->pageElement as $key => $string) {
-//            if (preg_match("/recent_game_content/", $string)) {
-//                $game = new stdClass();
-//
-//                $img = explode('<img src="', $this->pageElement[$key + 2]);
-//                $img = str_replace($this->closingTags, '', trim($img[1]));
-//                $game->image = $img;
-//
-//                $rawTiming = str_replace($this->closingTags, '', $this->pageElement[$key + 4]);
-//                $game->totTime    = trim($rawTiming);
-//                $game->lastPlayed = strip_tags($this->pageElement[$key + 5]);
-//                $game->lastPlayed = trim(preg_replace('/\s\s+/', ' ', $game->lastPlayed));
-//
-//                $name = explode('<div class="game_name"><a class="whiteLink" href="', $this->pageElement[$key + 6]);
-//                $name = explode('">', $name[1]);
-//                $game->name = trim(str_replace($this->closingTags, '', $name[1]));
-//                $game->page = $name[0];
-//
-//                $this->lastPlayed[] = $game;
-//            }
-//        }
-//    }
+    private function featuredGames()
+    {
+        $this->featuredGames = [];
+        foreach ($this->pageElement as $key => $string) {
+            $featured = new stdClass();
+            if (preg_match("/showcase_slot showcase_gamecollector_game /", $string)) {
+
+                $link = explode('<a href="', $this->pageElement[$key + 1]);
+                $featured->page = trim(str_replace($this->closingTags,'',$link[1]));
+
+                $img = explode('<img class="game_capsule" src="', $this->pageElement[$key + 2]);
+                $featured->img = trim(str_replace($this->closingTags, '', $img[1]));
+
+                $gamePage = file($featured->page);
+                foreach ($gamePage as $key => $string) {
+                    if (preg_match("/apphub_AppName/", $string)) {
+                        $name = explode('<div class="apphub_AppName ellipsis">', $gamePage[$key]);
+                        $featured->name = trim(str_replace($this->closingTags, '', $name[1]));
+                        break;
+                    }
+                }
+            }
+
+            if (!empty($featured->page)) {
+                $this->featuredGames[] = $featured;
+                if(count($this->featuredGames)==4) {
+                    break;
+                }
+            }
+        }
+    }
 
     /**
      * Fetch user achievements from the Steam user page
@@ -246,11 +259,11 @@ class SteamProfileReader
      */
     public function saveOnDb() {
         $dataset = array(
-            '_users' =>$this->userData,
-            '_favgames'=>$this->favGame,
-//            '_playedGames'=>$this->lastPlayed,
-            '_achievements'=>$this->achievements,
-            '_medals'=>$this->medals
+            '_users'        =>$this->userData,
+            '_favgames'     =>$this->favGame,
+            '_achievements' =>$this->achievements,
+            '_medals'       =>$this->medals,
+            '_featured'     =>$this->featuredGames
         );
 
         $dbLink = new PersistenceDB($this->steamID);
@@ -258,7 +271,7 @@ class SteamProfileReader
     }
 
     public function getUserData() { return $this->userData; }
-//    public function getLastPlayed() { return $this->lastPlayed; }
+    public function getFeaturedGames() { return $this->featuredGames; }
     public function getAchievements() { return $this->achievements; }
     public function getMedals() { return $this->medals; }
     public function getFavGame() { return $this->favGame; }

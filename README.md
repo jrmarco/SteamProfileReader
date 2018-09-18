@@ -50,14 +50,12 @@ Any type of abuse it's reasonable on a wrong usage of the component or modificat
             $game->time 	   : Favourite hours played
             $game->achivNumber : Favourite number of achievements
 ```
- 2. $steamProfileReader->getLastPlayed() - retrive an array of objects containing the last games played displayed on the user profile
-    	Structure of the LastPlayed object :
+ 2. $steamProfileReader->getFeaturedGames() - retrive an array of objects containing the featured games displayed on the user profile
+    	Structure of the FeaturedGame object :
 ```
-            $game->image      : Game image url
-            $game->totTime    : Game total hours played
-            $game->lastPlayed : Game last 'day' played
             $game->name       : Game name
-            $game->page       : Game url to Steam page
+            $game->page       : Game url to Steam page            
+            $game->img        : Game image url
 ```
  3. $steamProfileReader->getMedals() - retrive an array of objects containing the displayed medals on the user profile
     	Structure of the Medal object :
@@ -133,15 +131,11 @@ $steamProfileReader->saveOnDb();
 		`achivNumber` varchar(255) CHARACTER SET utf8 NOT NULL,
 		PRIMARY KEY UNIQUE (id)              
 
-		//PlayedGames table
-		`id` varchar(255) NOT NULL,
-		`steamID` varchar(255) CHARACTER SET utf8 NOT NULL,
-		`image` varchar(255) CHARACTER SET utf8 NOT NULL,
-		`totTime`     varchar(255) CHARACTER SET utf8 NOT NULL,
-		`lastPlayed` varchar(255) CHARACTER SET utf8 NULL,
-		`name` varchar(255) CHARACTER SET utf8 NULL,
-		`page` varchar(255) CHARACTER SET utf8 NULL,                                
-		PRIMARY KEY UNIQUE (id)              
+        // Featured table
+        `name` varchar(255) CHARACTER SET utf8 NULL,
+        `url` varchar(255) CHARACTER SET utf8 NOT NULL,
+        `image` varchar(255) CHARACTER SET utf8 NOT NULL,
+        PRIMARY KEY UNIQUE (name)
 
 		// Achievement table
 		`id` varchar(255) NOT NULL,

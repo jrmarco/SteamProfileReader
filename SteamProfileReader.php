@@ -109,7 +109,6 @@ class SteamProfileReader
                 $user->nickname = trim(strip_tags($this->pageElement[$key + 4]));
 
                 $user->level = trim(strip_tags($this->pageElement[$key + 31]));
-                $user->badgeName = trim(str_replace($this->closingTags,'',$this->pageElement[$key + 39]));
             }
 
             if (preg_match("/playerAvatarAutoSizeInner/", $string)) {
@@ -125,8 +124,14 @@ class SteamProfileReader
             }
 
             if (preg_match("/favorite_badge_icon/", $string)) { 
+                $name = explode('data-tooltip-html=',$this->pageElement[$key]);
+                $user->badgeName = trim(str_replace(['<br>','"'],[' ',''],$name[1]));
                 $img = explode('src="',$this->pageElement[$key + 3]);
                 $user->badgeImg  = trim(str_replace(array_merge($this->closingTags,array('" class="badge_icon small')),'',$img[1]));
+            }
+
+            if (preg_match("/persona_name persona_level/", $string)) { 
+                $user->level = strip_tags($this->pageElement[$key]);
             }
             
         }

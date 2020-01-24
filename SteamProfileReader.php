@@ -1,6 +1,8 @@
 <?php
 /**
- * SteamProfileReader v1.3
+ * SteamProfileReader v1.4
+ * 1.4 -> Changes :
+ *  New styling on the user page required a new indexing of elements to compose the user dataset
  * 1.3 -> Changes :
  *  Totally removed reference for last played games.
  *  Added featured games fetch
@@ -106,19 +108,27 @@ class SteamProfileReader
             if (preg_match("/profile_header_content/", $string)) {
                 $user->nickname = trim(strip_tags($this->pageElement[$key + 4]));
 
-                $img = explode('<img src="',$this->pageElement[$key + 29]);
+                $user->level = trim(strip_tags($this->pageElement[$key + 31]));
+                $user->badgeName = trim(str_replace($this->closingTags,'',$this->pageElement[$key + 39]));
+            }
+
+            if (preg_match("/playerAvatarAutoSizeInner/", $string)) {
+                $img = explode('<img src="',$this->pageElement[$key+1]);
                 $user->imgFull = trim(str_replace($this->closingTags,'',$img[1]));
                 $user->imgMid  = str_replace('_full','_medium',$user->imgFull);
                 $user->imgSmall= str_replace('_medium','',$user->imgMid);
+            }
 
-                $user->level = trim(strip_tags($this->pageElement[$key + 31]));
-                $user->badgeName = trim(str_replace($this->closingTags,'',$this->pageElement[$key + 39]));
-
-                $link = explode('href="',$this->pageElement[$key + 40]);
+            if (preg_match("/profile_header_badgeinfo_badge_area/", $string)) { 
+                $link = explode('href="',$this->pageElement[$key + 1]);
                 $user->badgePage = trim(str_replace($this->closingTags,'',$link[1]));
-                $img = explode('src="',$this->pageElement[$key + 41]);
+            }
+
+            if (preg_match("/favorite_badge_icon/", $string)) { 
+                $img = explode('src="',$this->pageElement[$key + 3]);
                 $user->badgeImg  = trim(str_replace(array_merge($this->closingTags,array('" class="badge_icon small')),'',$img[1]));
             }
+            
         }
 
         $this->userData = $user;
